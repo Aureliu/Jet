@@ -191,7 +191,7 @@ public class AceDocument {
 	}
 
 	public void addEvent (AceEvent event) {
-		events.add(event);
+		events.add(event);  //@AureDi:  add is from ArrayList.
 	}
 
 	/*  assumes elementType is a leaf element type */
@@ -223,7 +223,7 @@ public class AceDocument {
 	}
 
 	/**
-	 *  read file 'fileName' and return its contents as a StringBuffer
+	 *  read file 'fileName' and return its contents as a StringBuffer  @ The text of the file.
 	 */
 
 	static StringBuffer readDocument (String fileName) throws IOException {
