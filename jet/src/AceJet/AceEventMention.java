@@ -62,7 +62,22 @@ public class AceEventMention {
 	 *  our confidence in the presence of this event mention
 	 */
 	public double confidence = 1.0;
-
+	
+	/**
+	 *  @AureDi Sentence including the event.
+	 */
+	public String ldc_scope;
+	 
+	/**
+	 *  @AureDi The extent of the sentence in the file.
+	 */
+	public Span ldc_scopeExtent;
+	
+	/**
+	 *  @AureDi The Jet extent of the sentence in the file.
+	 */
+	public Span ldc_scopeJetExtent;
+	
 	public AceEventMention (String id, Span jetExtent, Span anchorJetExtent, String fileText) {
 		this.id = id;
 		this.arguments = new ArrayList<AceEventMentionArgument>();
@@ -96,6 +111,14 @@ public class AceEventMention {
 		anchorExtent = AceEntityMention.decodeCharseq(anchorElement);
 		anchorText = fileText.substring(this.anchorExtent.start(), this.anchorExtent.end()+1);
 		anchorJetExtent = AceEntityMention.aceSpanToJetSpan(anchorExtent, fileText);
+		
+		// @AureDi This is used to get the ldc_scope.
+		NodeList ldc_scopes = mentionElement.getElementsByTagName("ldc_scope");
+		Element ldc_scopeElement = (Element) ldc_scopes.item(0);
+		ldc_scopeExtent = AceEntityMention.decodeCharseq(ldc_scopeElement);
+		ldc_scope = fileText.substring(this.ldc_scopeExtent.start(), this.ldc_scopeExtent.end()+1);
+		ldc_scopeJetExtent = AceEntityMention.aceSpanToJetSpan(ldc_scopeExtent, fileText);
+		
 		NodeList arguments = mentionElement.getElementsByTagName("event_mention_argument");
 		for (int j=0; j<arguments.getLength(); j++) {
 			Element argumentElement = (Element) arguments.item(j);

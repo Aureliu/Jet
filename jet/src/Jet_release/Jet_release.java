@@ -3,9 +3,10 @@ package Jet_release;
 import java.io.IOException;
 import AceJet.Ace;
 import AceJet.AureDiTrainData;
+import AceJet.AureDi_Test;
 import AceJet.EventScorer;
-import AceJet.EventTypeAnalysis;
-import AceJet.SentenceAnalysis;
+import AceJet.AureDiEventTypeAnalysis;
+import AceJet.AureDiSentenceAnalysis;
 import AceJet.TrainEventTagger;
 
 public class Jet_release {
@@ -55,7 +56,7 @@ public class Jet_release {
         
 //		args = new String[6];
 //		args[0] = "-SentenceAnalysis";
-//		args[1] = "D:\\Corpus\\LDC2006D06\\Data\\LDC2006T06_Original\\data\\English\\ACE_List";
+//		args[1] = "D:\\Corpus\\LDC2006D06\\Data\\LDC2006T06_Original\\data\\English\\new_filelist_ACE_test";
 //		args[2] = "D:\\Corpus\\LDC2006D06\\Data\\LDC2006T06_Original\\data\\English";
 //		args[3] = "sgm";    
 //		args[4] = "D:\\Corpus\\LDC2006D06\\Data\\LDC2006T06_Original\\data\\English";
@@ -63,11 +64,19 @@ public class Jet_release {
         
 		args = new String[6];
 		args[0] = "-AureDiTrainData";
-		args[1] = "D:\\Corpus\\LDC2006D06\\Data\\LDC2006T06_Original\\data\\English\\new_filelist_ACE_test";//new_filelist_ACE_training";
+		args[1] = "D:\\Corpus\\LDC2006D06\\Data\\LDC2006T06_Original\\data\\English\\new_filelist_ACE_training _withintext";//new_filelist_ACE_test";
 		args[2] = "D:\\Corpus\\LDC2006D06\\Data\\LDC2006T06_Original\\data\\English";
 		args[3] = "sgm";    
 		args[4] = "D:\\Corpus\\LDC2006D06\\Data\\LDC2006T06_Original\\data\\English";
 		args[5] = "apf.xml"; 
+		
+//		args = new String[6];
+//		args[0] = "-AureDi_Test";
+//		args[1] = "D:\\Corpus\\LDC2006D06\\Data\\LDC2006T06_Original\\data\\English\\ACE_List";//test";//new_filelist_ACE_test";
+//		args[2] = "D:\\Corpus\\LDC2006D06\\Data\\LDC2006T06_Original\\data\\English";
+//		args[3] = "sgm";    
+//		args[4] = "D:\\Corpus\\LDC2006D06\\Data\\LDC2006T06_Original\\data\\English";
+//		args[5] = "apf.xml"; 
         
         if (args.length != 5 && args.length != 6 && args.length != 8) {
             PrintErrMsg();
@@ -101,14 +110,14 @@ public class Jet_release {
                 for (int i = 0; i < 5; i++) {
                 	EventTypeAnalysis_args[i] = args[i + 1];
                 }
-                EventTypeAnalysis.main(EventTypeAnalysis_args);
+                AureDiEventTypeAnalysis.main(EventTypeAnalysis_args);
                 break;
             case "-SentenceAnalysis":
                 String[] SentenceAnalysis_args = new String[5];
                 for (int i = 0; i < 5; i++) {
                 	SentenceAnalysis_args[i] = args[i + 1];
                 }
-                SentenceAnalysis.main(SentenceAnalysis_args);
+                AureDiSentenceAnalysis.main(SentenceAnalysis_args);
                 break;
             case "-AureDiTrainData":
                 String[] AureDiTrainData_args = new String[5];
@@ -116,6 +125,13 @@ public class Jet_release {
                 	AureDiTrainData_args[i] = args[i + 1];
                 }
                 AureDiTrainData.main(AureDiTrainData_args);
+                break;
+            case "-AureDi_Test":
+                String[] AureDi_Test_args = new String[5];
+                for (int i = 0; i < 5; i++) {
+                	AureDi_Test_args[i] = args[i + 1];
+                }
+                AureDi_Test.main(AureDi_Test_args);
                 break;
             default:
                 PrintErrMsg();
