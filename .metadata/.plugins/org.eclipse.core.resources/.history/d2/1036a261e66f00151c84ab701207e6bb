@@ -118,7 +118,6 @@ public class AceEventMention {
 		ldc_scopeExtent = AceEntityMention.decodeCharseq(ldc_scopeElement);
 		ldc_scope = fileText.substring(this.ldc_scopeExtent.start(), this.ldc_scopeExtent.end()+1);
 		ldc_scopeJetExtent = AceEntityMention.aceSpanToJetSpan(ldc_scopeExtent, fileText);
-		ldc_scopeExtent.setEnd(ldc_scopeExtent.end()+1);
 		
 		NodeList arguments = mentionElement.getElementsByTagName("event_mention_argument");
 		for (int j=0; j<arguments.getLength(); j++) {

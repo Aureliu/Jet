@@ -32,7 +32,7 @@ public class AureDiTrainData {
 		keyApfDirectory = args[3];
 		keyApfExtension = args[4];
 		
-        File writename = new File("C:\\Users\\v-mingdi\\Desktop\\ACE_training"); // path + filename.
+        File writename = new File("C:\\Users\\v-mingdi\\Desktop\\test-2"); // path + filename.
         writename.createNewFile(); // construct a new file
         BufferedWriter out = new BufferedWriter(new FileWriter(writename));  
         
@@ -101,8 +101,6 @@ public class AureDiTrainData {
 					}
 				}
 		        try {
-		        	
-		            //@AureDi  Write ldc without tokeniztion.
 //		        	StringBuffer Text = new StringBuffer (mention.ldc_scope);
 //		        	for(int i = 0; i < mention.ldc_scope.length(); i++){
 //		        		if (mention.ldc_scope.charAt(i) == '\n'){       			
@@ -111,19 +109,10 @@ public class AureDiTrainData {
 //		        		}
 //		        	}
 //					out.write(Text.toString() + "_$_" + event.subtype);
-		        	
-		        	//@AureDi Write ldc with tokeniztion.
 					for(int j = 0; j < tokens.size(); j++){
-						out.write(  
-								getString(
-										doc.text().substring(  
-												((Annotation)tokens.get(j)).span().start(), ((Annotation)tokens.get(j)).span().end() 
-												)
-										) 
-								);
+						out.write( doc.text().substring(  ((Annotation)tokens.get(j)).span().start(), ((Annotation)tokens.get(j)).span().end() ));
 					}	
 					out.write("_$_" + event.subtype);
-					
 					for(int i = 0; i<anchors.size(); i++){
 						out.write("_$_" + RecAnchor[i]);
 					}
@@ -148,72 +137,36 @@ public class AureDiTrainData {
 			}
 		}
 		
-		//@AureDI  Write the text to the file without tokenization.
-		for (int i = 0; i < zones.size(); i++) {	
-			ExternalDocument docsentence = getDoc(textFileName);
-			Tokenizer.tokenize(docsentence, ((Annotation) zones.get(i)).span());
-			Vector tokens = docsentence.annotationsOfType("token", span);
-			
-			try {
-				
-				for(int j = 0; j < tokens.size(); j++){
-				out.write(  
-						getString(
-								doc.text().substring(  
-										((Annotation)tokens.get(j)).span().start(), ((Annotation)tokens.get(j)).span().end() 
-										)
-								) 
-						);
-				}			
-				out.write("_$_NoEvent" + "\r\n");
+		//@AureDI  Write the text to the file.
+		for (int i = 0; i < zones.size(); i++) {
+			int start = ((Annotation) zones.get(i)).span().start();
+			int end = ((Annotation) zones.get(i)).span().end();
+			while(doc.text().charAt(end-1) == '\n' || doc.text().charAt(end-1) == ' ')
+				end--;
+			try {		
+				String text = doc.text().substring(start, end);
+				StringBuffer Text = new StringBuffer(text); 	
+				for( int j = 0; j < text.length(); j++){
+	        		if (text.charAt(j) == '\n'){       			
+	        			Text.deleteCharAt(j);
+	        			Text.insert(j, ' ');
+	        		}
+				}
+				out.write(Text.toString() + "_$_NoEvent" + "\r\n");
 			}catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
-		
-		//@AureDI  Write the text to the file without tokenization.
-//		for (int i = 0; i < zones.size(); i++) {
-//			int start = ((Annotation) zones.get(i)).span().start();
-//			int end = ((Annotation) zones.get(i)).span().end();
-//			while(doc.text().charAt(end-1) == '\n' || doc.text().charAt(end-1) == ' ')
-//				end--;
-//			try {		
-//				String text = doc.text().substring(start, end);
-//				StringBuffer Text = new StringBuffer(text); 	
-//				for( int j = 0; j < text.length(); j++){
-//	        		if (text.charAt(j) == '\n'){       			
-//	        			Text.deleteCharAt(j);
-//	        			Text.insert(j, ' ');
-//	        		}
-//				}
-//				out.write(Text.toString() + "_$_NoEvent" + "\r\n");
-//			}catch (IOException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-//		}
 	}
 	
-	// @AUreDi process the tokens in the text.
-	public static String getString(String text){	
-		int end = text.length();
-		while(text.charAt(end-1) == '\n' || text.charAt(end-1) == ' ')
-			end--;
-		StringBuffer Text = new StringBuffer(text.substring(0, end)); 
-//		int j;
-//		for( j = 0; j < text.length(); j++){
-//    		if (text.charAt(j) == '\n'){       			
-//    			Text.deleteCharAt(j);
-//    			Text.insert(j, ' ');
-//    		}
-//		}
-
-		if( !(Text.charAt(end-1) == ' '))
-			Text.append(' ');
-		return Text.toString();
+	public static String getString(Span span){
+		StringBuffer Text = new StringBuffer(); 
+		for(int i = span.start(); i < span.end(); i++){
+			
+		}
+		return keyApfDirectory;
 	}
-	
 	public static ExternalDocument getDoc (String textFileName){
 		ExternalDocument doc = new ExternalDocument("sgml", textFileName);	//creates a new external document associated with file 'fileName'.  The format of the file is given by 'format'.
 		doc.setAllTags(true);

@@ -32,7 +32,7 @@ public class AureDiTrainData {
 		keyApfDirectory = args[3];
 		keyApfExtension = args[4];
 		
-        File writename = new File("C:\\Users\\v-mingdi\\Desktop\\ACE_training"); // path + filename.
+        File writename = new File("C:\\Users\\v-mingdi\\Desktop\\ACE_dev"); // path + filename.
         writename.createNewFile(); // construct a new file
         BufferedWriter out = new BufferedWriter(new FileWriter(writename));  
         
