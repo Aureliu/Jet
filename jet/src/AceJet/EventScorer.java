@@ -64,7 +64,7 @@ public class EventScorer {
 //			scoreDocument (docName);		
 		while ((docName = docListReader.readLine()) != null)
 		{
-			docName = getFileNameNoEx(docName);	//remove the extension of the file
+			//docName = getFileNameNoEx(docName);	//remove the extension of the file
 			scoreDocument (docName);
 		}
 

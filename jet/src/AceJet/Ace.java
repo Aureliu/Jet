@@ -293,6 +293,10 @@ public class Ace {
 
 	public static void processFile (String currentDocPath) throws IOException{
 		docCount++;
+		
+		//@AureDi  add extension to the pathname
+		//currentDocPath = currentDocPath + ".sgm";
+		
 		logger.info ("\nProcessing document " + docCount + ": " + currentDocPath);
 		String currentDocFileName = (new File(currentDocPath)).getName();
 		String currentDocId = removeFileExtension(currentDocFileName);

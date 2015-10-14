@@ -1,8 +1,8 @@
 package AceJet;
 
 /**
- *  This function calculate the number of triggers in each sentence.
- *  v-mingdi September 28th, 2015
+ *  This function generates the data with subtype, position and trigger.
+ *  v-mingdi October 10th, 2015
  */
 
 
@@ -20,6 +20,7 @@ public class AureDiTrainData {
 	static String textExtension;
 	static String keyApfDirectory;
 	static String keyApfExtension;
+	static String outputfile;
 	static Map<Integer, Integer> store_corpus = new HashMap<Integer, Integer> ();
 	static Map<Integer, Integer> store_doc = new HashMap<Integer, Integer> ();
 	static Span spantest;
@@ -31,8 +32,9 @@ public class AureDiTrainData {
 		textExtension = args[2];
 		keyApfDirectory = args[3];
 		keyApfExtension = args[4];
+		outputfile = args[5];
 		
-        File writename = new File("C:\\Users\\v-mingdi\\Desktop\\ACE_training"); // path + filename.
+        File writename = new File(outputfile); // path + filename.
         writename.createNewFile(); // construct a new file
         BufferedWriter out = new BufferedWriter(new FileWriter(writename));  
         
@@ -86,7 +88,11 @@ public class AureDiTrainData {
 				//@AureDi  Get the sentence with Tag.
 				ExternalDocument doctoken = getDoc(textFileName);
 				ExternalDocument docanchor = getDoc(textFileName);
+			
+				//@AureDi You should recover the the following sentence and annotate the next sentence
 				Tokenizer.tokenize(doctoken, mention.ldc_scopeExtent);
+			//	Tokenizer.tokenize(doctoken, mention.extent);
+				
 				Vector tokens = doctoken.annotationsOfType("token", span);
 				Tokenizer.tokenize(docanchor, mention.anchorExtent);
 				Vector anchors = docanchor.annotationsOfType("token", span);
