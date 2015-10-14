@@ -5,10 +5,8 @@ package AceJet;
  *  v-mingdi October 13th, 2015
  */
 
-
 import java.util.*;
 import java.io.*;
-
 import Jet.Lex.Tokenizer;
 import Jet.Tipster.*;
 import Jet.Zoner.SentenceSplitter;
@@ -21,8 +19,7 @@ public class AureDiTriggerAna {
 	static String keyApfDirectory;
 	static String keyApfExtension;
 	static String outputfile;
-	static Map<Integer, Integer> store_corpus = new HashMap<Integer, Integer> ();
-	static Map<Integer, Integer> store_doc = new HashMap<Integer, Integer> ();
+	static Map<String,Integer> Trigger = new TreeMap<String,Integer>();
 	static Span spantest;
 	
 	public static void main(String[] args) throws IOException {
@@ -34,6 +31,7 @@ public class AureDiTriggerAna {
 		keyApfExtension = args[4];
 		outputfile = args[5];
 		
+		//@AureDi: Create a new writer to write data. 
         File writename = new File(outputfile); // path + filename.
         writename.createNewFile(); // construct a new file
         BufferedWriter out = new BufferedWriter(new FileWriter(writename));  
@@ -47,8 +45,15 @@ public class AureDiTriggerAna {
 			//
 			System.out.println(docName);
 		}	
+		Iterator<Map.Entry<String, Integer>> iter = Trigger.entrySet().iterator();
+		while ( iter.hasNext() ){
+			Map.Entry<String,Integer> TriggerTem = iter.next();
+			out.write(TriggerTem.getKey().toString() + ' ' + TriggerTem.getValue().toString() + "\r\n");
+		}
+		out.write(Trigger.toString() + "\r\n");
         out.flush(); // write the buffer to the file.
         out.close(); // close the file  
+        docListReader.close();
 	}
 	
 	/**
@@ -56,28 +61,23 @@ public class AureDiTriggerAna {
 	 *  v-mingdi September 1th, 2015
 	 */
 	public static void processDocument (String docName, BufferedWriter out) {
-				
-		int NumTrigger = 0;	// Record the number of triggers in this document.
 		
-		// open the doc to be processed
+	// open the doc to be processed
 		String textFileName = textDirectory + "/" + docName + "." + textExtension;
-		ExternalDocument doc = getDoc(textFileName);
-		
-		Vector<Annotation> textSegments = doc.annotationsOfType ("TEXT");
 		Span span;
+		
+// process text in Tag <TEXT>.	
+		ExternalDocument doc = getDoc(textFileName,"TEXT");
+		Vector<Annotation> textSegments = doc.annotationsOfType ("TEXT");
 		if (textSegments != null && textSegments.size() > 0)
 			span = textSegments.get(0).span();	//@di ? the span of doc = text to be processed
 		else
-			span = doc.fullSpan();
-		
+			span = doc.fullSpan();		
 		if (!span.equals(spantest))
 			System.out.println("Warning: ************ Span is wrong *********** ");
 		//code from control.applyScript()
-		SentenceSplitter.split(doc, span);
-		Vector zones = doc.annotationsOfType("sentence", span);		
 		
 		// record the trigger in this doc
-		Map<Integer, Span> store_trigger= new HashMap<Integer, Span> ();
 		String keyApfFileName = keyApfDirectory + "/" + docName + "." + keyApfExtension;
 		AceDocument aceDoc = new AceDocument(textFileName, keyApfFileName);	
 		// ^ very important.creat structure data of text based on text and annotation,
@@ -85,127 +85,20 @@ public class AureDiTriggerAna {
 		for (AceEvent event : aceDoc.events) {	
 			// | traverse all event mention in event
 			for (AceEventMention mention : event.mentions) {
-				//@AureDi  Get the sentence with Tag.
-				ExternalDocument doctoken = getDoc(textFileName);
-				ExternalDocument docanchor = getDoc(textFileName);
-			
-				//@AureDi You should recover the the following sentence and annotate the next sentence
-				Tokenizer.tokenize(doctoken, mention.ldc_scopeExtent);
-			//	Tokenizer.tokenize(doctoken, mention.extent);
-				
-				Vector tokens = doctoken.annotationsOfType("token", span);
-				Tokenizer.tokenize(docanchor, mention.anchorExtent);
-				Vector anchors = docanchor.annotationsOfType("token", span);
-				int[] RecAnchor = new int [anchors.size()];
-				for(int i = 0; i < anchors.size(); i++){
-					for(int j = 0; j < tokens.size(); j++){
-						if (  ( (Annotation)anchors.get(i) ).span().within( ( (Annotation) tokens.get(j)).span() ) 
-							||  ((Annotation)tokens.get(j)).span().within( ( (Annotation) anchors.get(i)).span() ) ){
-							//System.out.println(mention.anchorText);
-							RecAnchor[i] = j+1;
-						}
-					}
-				}
-		        try {
-		        	
-		            //@AureDi  Write ldc without tokeniztion.
-//		        	StringBuffer Text = new StringBuffer (mention.ldc_scope);
-//		        	for(int i = 0; i < mention.ldc_scope.length(); i++){
-//		        		if (mention.ldc_scope.charAt(i) == '\n'){       			
-//		        			Text.deleteCharAt(i);
-//		        			Text.insert(i, ' ');
-//		        		}
-//		        	}
-//					out.write(Text.toString() + "_$_" + event.subtype);
-		        	
-		        	//@AureDi Write ldc with tokeniztion.
-					for(int j = 0; j < tokens.size(); j++){
-						out.write(  
-								getString(
-										doc.text().substring(  
-												((Annotation)tokens.get(j)).span().start(), ((Annotation)tokens.get(j)).span().end() 
-												)
-										) 
-								);
-					}	
-					out.write("_$_" + event.subtype);
-					
-					for(int i = 0; i<anchors.size(); i++){
-						out.write("_$_" + RecAnchor[i]);
-					}
-					out.write("_$_" + mention.anchorText + "\r\n");
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} // \r\n is the newline order
-		        //@AureDi Record the trigger in the sentence.
-				store_trigger.put( NumTrigger , mention.anchorExtent);
-				NumTrigger ++;
+				String key = mention.anchorText + ':' + event.subtype;
+				Integer freq = Trigger.get(key);
+				Trigger.put(key, freq == null ? 1 : freq+1);
 			}
 		}
-		
-		//@AureDi Delete the sentence including the event
-		for (int i = 0; i < NumTrigger; i++){
-			for (int j = 0; j < zones.size(); j++) {
-				if (store_trigger.get(i).within( ( (Annotation) zones.get(j)).span() ) ){
-					zones.remove(j);
-					break;
-				}	
-			}
-		}
-		
-		//@AureDI  Write the text to the file without tokenization.
-		for (int i = 0; i < zones.size(); i++) {	
-			ExternalDocument docsentence = getDoc(textFileName);
-			Tokenizer.tokenize(docsentence, ((Annotation) zones.get(i)).span());
-			Vector tokens = docsentence.annotationsOfType("token", span);
-			
-			try {
-				
-				for(int j = 0; j < tokens.size(); j++){
-				out.write(  
-						getString(
-								doc.text().substring(  
-										((Annotation)tokens.get(j)).span().start(), ((Annotation)tokens.get(j)).span().end() 
-										)
-								) 
-						);
-				}			
-				out.write("_$_NoEvent" + "\r\n");
-			}catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		
 	}
 	
-	// @AUreDi process the tokens in the text.
-	public static String getString(String text){	
-		int end = text.length();
-		while(text.charAt(end-1) == '\n' || text.charAt(end-1) == ' ')
-			end--;
-		StringBuffer Text = new StringBuffer(text.substring(0, end)); 
-//		int j;
-//		for( j = 0; j < text.length(); j++){
-//    		if (text.charAt(j) == '\n'){       			
-//    			Text.deleteCharAt(j);
-//    			Text.insert(j, ' ');
-//    		}
-//		}
-
-		if( !(Text.charAt(end-1) == ' '))
-			Text.append(' ');
-		return Text.toString();
-	}
-	
-	public static ExternalDocument getDoc (String textFileName){
+	public static ExternalDocument getDoc (String textFileName, String Tag){
 		ExternalDocument doc = new ExternalDocument("sgml", textFileName);	//creates a new external document associated with file 'fileName'.  The format of the file is given by 'format'.
 		doc.setAllTags(true);
 		doc.open();		
 		
 		// split the sentence in this doc
-		Vector<Annotation> textSegments = doc.annotationsOfType ("TEXT");
+		Vector<Annotation> textSegments = doc.annotationsOfType (Tag);
 		if (textSegments != null && textSegments.size() > 0)
 			spantest = textSegments.get(0).span();	//@di ? the span of doc = text to be processed
 		else
@@ -214,46 +107,6 @@ public class AureDiTriggerAna {
 			    doc.annotationsOfType("textBreak") == null)
 				SpecialZoner.findSpecialZones (doc);
 		return doc;
-	}
+	} 
 	
-    public static String getFileNameNoEx(String filename) {   
-        if ((filename != null) && (filename.length() > 0)) {   
-            int dot = filename.lastIndexOf('.');   
-            if ((dot >-1) && (dot < (filename.length()))) {   
-                return filename.substring(0, dot);   
-            }   
-        }   
-        return filename;   
-    } 
-    
-    public static void writedata(String pathname, boolean bool){   	
-	    try { // In order to avoid construct or read failure,  use try catch the error.
-	    	if (bool){
-		        /* read the txt file */  
-		        File filename = new File(pathname); // pathname include the filename   
-		        InputStreamReader reader = new InputStreamReader(  
-		                new FileInputStream(filename)); // construct a input stream reader  
-		        BufferedReader br = new BufferedReader(reader); // transfer the language to the computer read  
-		        String line = "";  
-		        line = br.readLine();  
-		        while (line != null) {  
-		            line = br.readLine(); // once a line
-		        }  
-	    	}
-	    	else{
-	
-		        /* write Txt file */  
-		        File writename = new File(pathname); // path + filename.
-		        writename.createNewFile(); // construct a new file
-		        BufferedWriter out = new BufferedWriter(new FileWriter(writename));  
-		        out.write("I can wrtite file.\r\n"); // \r\n is the newline order.
-		        out.flush(); // write the buffer to the file.
-		        out.close(); // close the file  
-	    	}
-	
-	    } catch (Exception e) {  
-	        e.printStackTrace();  
-	    }
-    }
-
 }

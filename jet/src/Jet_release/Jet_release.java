@@ -4,6 +4,7 @@ import java.io.IOException;
 import AceJet.Ace;
 import AceJet.AureDiDMCNNData;
 import AceJet.AureDiTrainData;
+import AceJet.AureDiTriggerAna;
 import AceJet.AureDi_Test;
 import AceJet.EventScorer;
 import AceJet.AureDiEventTypeAnalysis;
@@ -92,14 +93,23 @@ public class Jet_release {
 //		args[5] = "apf.xml"; 
 //		args[6] = "C:\\Users\\v-mingdi\\Desktop\\ACE_training";
 		
+//		args = new String[7];
+//		args[0] = "-AureDiDMCNNData";
+//		args[1] = "D:\\Corpus\\LDC2006D06\\Data\\LDC2006T06_Original\\data\\English\\new_filelist_ACE_training_anchorwithintext";//new_filelist_ACE_test";
+//		args[2] = "D:\\Corpus\\LDC2006D06\\Data\\LDC2006T06_Original\\data\\English";
+//		args[3] = "sgm";    
+//		args[4] = "D:\\Corpus\\LDC2006D06\\Data\\LDC2006T06_Original\\data\\English";
+//		args[5] = "apf.xml"; 
+//		args[6] = "C:\\Users\\v-mingdi\\Desktop\\ACE_DMCNN_training";
+		
 		args = new String[7];
-		args[0] = "-AureDiDMCNNData";
-		args[1] = "D:\\Corpus\\LDC2006D06\\Data\\LDC2006T06_Original\\data\\English\\new_filelist_ACE_training_anchorwithintext";//new_filelist_ACE_test";
+		args[0] = "-AureDiTriggerAna";
+		args[1] = "D:\\Corpus\\LDC2006D06\\Data\\LDC2006T06_Original\\data\\English\\ACE_List";//new_filelist_ACE_test";
 		args[2] = "D:\\Corpus\\LDC2006D06\\Data\\LDC2006T06_Original\\data\\English";
 		args[3] = "sgm";    
 		args[4] = "D:\\Corpus\\LDC2006D06\\Data\\LDC2006T06_Original\\data\\English";
 		args[5] = "apf.xml"; 
-		args[6] = "C:\\Users\\v-mingdi\\Desktop\\ACE_DMCNN_training";
+		args[6] = "C:\\Users\\v-mingdi\\Desktop\\ACE_Trigger";
 		
 //		args = new String[6];
 //		args[0] = "-AureDi_Test";
@@ -163,6 +173,13 @@ public class Jet_release {
                 	AureDiDMCNNData_args1[i] = args[i + 1];
                 }
                 AureDiDMCNNData.main(AureDiDMCNNData_args1);
+                break;
+            case "-AureDiTriggerAna":
+                String[] AureDiTriggerAna_args1 = new String[6];
+                for (int i = 0; i < 6; i++) {
+                	AureDiTriggerAna_args1[i] = args[i + 1];
+                }
+                AureDiTriggerAna.main(AureDiTriggerAna_args1);
                 break;
             case "-AureDi_Test":
                 String[] AureDi_Test_args = new String[5];
